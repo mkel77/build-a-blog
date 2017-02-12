@@ -24,13 +24,12 @@ class Art(db.Model):
     created = db.DateTimeProperty(auto_now_add = True)
 
 class MainPage(Handler):
-    def render_front(self, title = "", art = "", error = ""):
-        arts = db.GqlQuery("SELECT * FROM Art "
-                           "ORDER BY created DESC ")
-        self.render("front.html", title = title, art = art, error = error, arts = arts)
+    def render_newpost(self, title = "", art = "", error = ""):
+
+        self.render("newpost.html", title = title, art = art, error = error)
 
     def get(self):
-        self.render_front()
+        self.render_newpost()
 
     def post(self):
         title = self.request.get("title")
@@ -40,11 +39,21 @@ class MainPage(Handler):
             a = Art(title = title, art = art)
             a.put()
 
-            self.redirect("/")
+            self.redirect("/blog")
         else:
-            error="no"
-            self.render_front(title, art, error)
+            error="we need both a title and a body!"
+            self.render_newpost(title, art, error)
+
+class Blog(Handler):
+    def get(self):
+        arts = db.GqlQuery("SELECT * FROM Art "
+                           "ORDER BY created DESC "
+                           "LIMIT 5 ")
+
+        self.render("blog.html", arts = arts)
+
 
 app = webapp2.WSGIApplication([
-    ('/', MainPage)
+    ('/blog/newpost', MainPage),
+    ('/blog', Blog),
 ], debug=True)
