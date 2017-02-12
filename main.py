@@ -52,8 +52,24 @@ class Blog(Handler):
 
         self.render("blog.html", arts = arts)
 
+class ViewPostHandler(webapp2.RequestHandler):
+    def get(self, id):
+        single_post = Art.get_by_id(int(id))
+
+        # if the id does not exist inthe db, error.
+        if not single_post:
+            t = jinja_env.get_template("error.html")
+            content = t.render(id = id)
+            self.response.write(content)
+
+        else:
+            t = jinja_env.get_template("singlepost.html")
+            content = t.render(a = single_post)
+            self.response.write(content)
+
 
 app = webapp2.WSGIApplication([
     ('/blog/newpost', MainPage),
     ('/blog', Blog),
+    webapp2.Route('/blog/<id:\d+>', ViewPostHandler)
 ], debug=True)
