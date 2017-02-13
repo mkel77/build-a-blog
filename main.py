@@ -39,7 +39,16 @@ class MainPage(Handler):
             a = Art(title = title, art = art)
             a.put()
 
-            self.redirect("/blog")
+            akey = a.key().id()
+            self.redirect("/blog/" + str(akey))
+            #self.response.write(akey)
+            #t = jinja_env.get_template("singlepost.html")
+            #content = t.render(a = title)
+            #self.response.write(content)
+            #"/blog/{{art.key().id()}}"
+            #self.redirect("/welcome?username=" + cgi.escape(user_username, quote = True))
+
+
         else:
             error="we need both a title and a body!"
             self.render_newpost(title, art, error)
@@ -51,6 +60,7 @@ class Blog(Handler):
                            "LIMIT 5 ")
 
         self.render("blog.html", arts = arts)
+
 
 class ViewPostHandler(webapp2.RequestHandler):
     def get(self, id):
